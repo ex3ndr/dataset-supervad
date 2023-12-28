@@ -21,10 +21,42 @@ TODO
 * [SLR28](https://openslr.org/28/) (Apache 2.0) - Real RIR
 * [VOiCES](https://iqtlabs.github.io/voices/) (CC BY 4.0) - Clean Voice, Noises and RIR
 
-## Download source dataset
+## Reproduction
 
-Downloading and synthesizing the dataset requires about 2TB of disk space.
+> [!CAUTION]
+> Downloading and synthesizing the dataset requires about 2TB of disk space.
+
+### Downloading sources
+To download source datasets, you can invoke `download.sh` script. For this script `aria2` is required.
 
 ```bash
 ./download.sh
 ```
+
+### Installing dependencies
+
+Script have very limited amount of dependencies that you probabbly already have installed.
+
+```bash
+pip install tqdm torch torchaudio soundfile
+```
+
+### Preparing source datasets
+
+Before synthesizing the dataset, you need to prepare source datasets. To do so, you can invoke `prepare.py` script.
+
+```bash
+python3 prepare.py
+```
+
+### Synthesizing the dataset
+
+To synthesize the dataset, you can invoke `synthesize.py` script.
+
+```bash
+python3 synthesize.py
+```
+
+# License
+
+CC BY 4.0
