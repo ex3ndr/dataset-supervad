@@ -1,4 +1,4 @@
-# SuperVAD dataset
+# 🚀 SuperVAD dataset
 
 This repository contains the one million of 5 second segments of augmented voice and noise combinations with labels.
 
@@ -20,11 +20,12 @@ TODO
 * [SLR26](https://openslr.org/26/) (CC BY 4.0) - Synthetic RIR
 * [SLR28](https://openslr.org/28/) (Apache 2.0) - Real RIR
 * [VOiCES](https://iqtlabs.github.io/voices/) (CC BY 4.0) - Clean Voice, Noises and RIR
+* [DNS-4](https://github.com/microsoft/DNS-Challenge) (Public Domain/CC BY 4.0/Attr) - Clean Voice and Noises
 
 ## Reproduction
 
 > [!CAUTION]
-> Downloading and synthesizing the dataset requires about 2TB of disk space.
+> Downloading and synthesizing the dataset requires about 3TB of disk space and several hours to download, unpack and synthesize.
 
 ### Downloading sources
 To download source datasets, you can invoke `download.sh` script. For this script `aria2` is required.
@@ -38,7 +39,7 @@ To download source datasets, you can invoke `download.sh` script. For this scrip
 Script have very limited amount of dependencies that you probabbly already have installed.
 
 ```bash
-pip install tqdm torch torchaudio soundfile
+pip install tqdm glob torch torchaudio soundfile
 ```
 
 ### Preparing source datasets

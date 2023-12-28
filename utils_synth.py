@@ -1,5 +1,5 @@
 import random
-from .utils import SAMPLE_RATE
+from utils import SAMPLE_RATE
 import torch
 import torchaudio
 import torchaudio.functional as F

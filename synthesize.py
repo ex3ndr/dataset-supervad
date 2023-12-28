@@ -4,6 +4,7 @@ from glob import glob
 import random
 import json
 import torchaudio
+from torchaudio.io import CodecConfig
 from utils import labels_to_intervals, SAMPLE_RATE, load_audio, save_audio
 from utils_synth import synthesize_sample, resolve, sequental, one_of, maybe
 
@@ -33,15 +34,17 @@ PARAM_CODECS = [
     {'format': "wav", 'encoder': "pcm_mulaw"},
     {'format': "g722"}, # Popular in VoIP
     # {'format': "ogg", 'encoder': "opus", ""}, # Still experimental?
-    {"format": "mp3", "codec_config": torchaudio.io.CodecConfig(bit_rate=8_000)}, # Low quality
-    {"format": "mp3", "codec_config": torchaudio.io.CodecConfig(bit_rate=64_000)} # Average quality
+
+    # NOTE: If you have compiler crash on this line, try to install ffmpeg in your system
+    {"format": "mp3", "codec_config": CodecConfig(bit_rate=8_000)}, # Low quality
+    {"format": "mp3", "codec_config": CodecConfig(bit_rate=64_000)} # Average quality
 ]
 
 #
 # Synthesizer
 #
 
-def synthesize(to):
+def synthesize(to, speech_dir, background_dir, rir_dir):
 
     # Check directory
     if os.path.isdir(to):
@@ -49,9 +52,10 @@ def synthesize(to):
     os.mkdir(to)
 
     # Speech
-    speech_files = glob("./dataset/output/source_speech/**/*.wav", recursive=True)
-    background_files = glob("./dataset/output/source_non_speech/**/*.wav", recursive=True)
-    rir_files = glob("./dataset/output/source_rir/**/*.wav", recursive=True)
+    print("Indexing files...")
+    speech_files = glob(speech_dir + "**/*.wav", recursive=True)
+    background_files = glob(background_dir + "**/*.wav", recursive=True)
+    rir_files = glob(rir_dir + "**/*.wav", recursive=True)
 
     # RIR
     rir_prob = 0.8
@@ -132,7 +136,7 @@ def synthesize(to):
         if i % 1000 == 0 and not os.path.isdir(to + dir):
             os.mkdir(to + dir)
         fname = f'{dir}/{i:08d}.wav'
-        output[fname] = labels_to_intervals(labels)
+        output[fname] = labels_to_intervals(labels, 0.02) # 20ms tokens
         save_audio(to + fname, sample)
 
     # Output
@@ -145,4 +149,7 @@ def synthesize(to):
 # Synthesize
 #
         
-synthesize("./dataset/output/synthesized/")
+synthesize("./dataset/output/synth_train/", 
+           speech_dir="./dataset/output/speech_train/",
+           background_dir="./dataset/output/non_speech/",
+           rir_dir="./dataset/output/rir/")
