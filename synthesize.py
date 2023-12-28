@@ -7,6 +7,7 @@ import torchaudio
 from torchaudio.io import CodecConfig
 from utils import labels_to_intervals, SAMPLE_RATE, load_audio, save_audio
 from utils_synth import synthesize_sample, resolve, sequental, one_of, maybe
+import multiprocessing
 
 #
 # Parameters
@@ -15,6 +16,8 @@ from utils_synth import synthesize_sample, resolve, sequental, one_of, maybe
 # Synthesizing parameters
 PARAM_DURATION = 5
 PARAM_COUNT = 1000000
+PARAM_COUNT_TEST = 10000
+PARAM_WORKERS = multiprocessing.cpu_count()
 
 # Speech parameters
 PARAM_SPEECH_PROB = 0.5 # Probability of speech presence
@@ -118,14 +121,17 @@ def synthesize_iter(to, speech_files, background_files, rir_files, index):
 
     # Create dir if needed
     dir = f'{(index // 1000) * 1000:08d}'
-    if not os.path.isdir(to + dir):
-        os.mkdir(to + dir)
     fname = f'{dir}/{index:08d}.wav'
     labels = labels_to_intervals(labels, 0.02) # 20ms tokens
     save_audio(to + fname, sample)
 
     # Return result
     return fname, labels
+
+def synthesize_parallel(args):
+    to, speech_files, background_files, rir_files, i = args
+    return synthesize_iter(to, speech_files, background_files, rir_files, i)
+
 
 def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
 
@@ -140,12 +146,31 @@ def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
     background_files = glob(background_dir + "**/*.wav", recursive=True)
     rir_files = glob(rir_dir + "**/*.wav", recursive=True)
 
-    # Synthesizing loop
-    output = {}
-    for i in tqdm(range(count)):
-        fname, labels = synthesize_iter(to, speech_files, background_files, rir_files, i)
-        output[fname] = labels
+    # Create folders
+    print("Creating folders...")
+    for i in range(0, count, 1000):
+        dir = f'{i:08d}'
+        if not os.path.isdir(to + dir):
+            os.mkdir(to + dir)
 
+    # Synthesizing loop
+    print("Synthesizing...")
+    output = {}
+    if PARAM_WORKERS == 0:
+        for i in tqdm(range(count)):
+            fname, labels = synthesize_iter(to, speech_files, background_files, rir_files, i)
+            output[fname] = labels
+    else:
+        with multiprocessing.Manager() as manager:
+            speech_files = manager.list(speech_files)
+            background_files = manager.list(background_files)
+            rir_files = manager.list(rir_files)
+            args_list = [(to, speech_files, background_files, rir_files, i) for i in range(count)]
+            with multiprocessing.Pool(processes=PARAM_WORKERS) as pool:
+                for result in tqdm(pool.imap_unordered(synthesize_parallel, args_list), total=count):
+                    fname, labels = result
+                    output[fname] = labels
+    
     # Output
     with open(to + "meta.json", "w") as outfile:
         json.dump(output, outfile)
@@ -153,11 +178,19 @@ def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
 
 
 #
-# Synthesize
+# Main
 #
-        
-synthesize("./dataset/output/synth_test/", 
+
+if __name__ == "__main__":
+    print("Synthesizing test set...")
+    synthesize("./dataset/output/synth_test/", 
            speech_dir="./dataset/output/speech_test/",
            background_dir="./dataset/output/non_speech/",
            rir_dir="./dataset/output/rir/",
-           count=1000)
+           count=PARAM_COUNT_TEST)
+    print("Synthesizing train set...")
+    synthesize("./dataset/output/synth_train/", 
+           speech_dir="./dataset/output/speech_train/",
+           background_dir="./dataset/output/non_speech/",
+           rir_dir="./dataset/output/rir/",
+           count=PARAM_COUNT)
