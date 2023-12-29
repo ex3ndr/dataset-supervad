@@ -60,6 +60,14 @@ To synthesize the dataset, you can invoke `synthesize.py` script.
 python3 synthesize.py
 ```
 
+### Packaging the dataset
+
+To package the dataset you need `tar` and `pigz` to be installed.
+
+```bash
+./pack.sh
+```
+
 # License
 
 CC BY 4.0
