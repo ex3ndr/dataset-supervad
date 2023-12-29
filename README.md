@@ -21,11 +21,13 @@ TODO
 * [SLR28](https://openslr.org/28/) (Apache 2.0) - Real RIR
 * [VOiCES](https://iqtlabs.github.io/voices/) (CC BY 4.0) - Clean Voice, Noises and RIR
 * [DNS-4](https://github.com/microsoft/DNS-Challenge) (Public Domain/CC BY 4.0/Attr) - Clean Voice and Noises
+* [Realistic urban sound mixture dataset](https://zenodo.org/records/1184443) (CC BY 4.0) - Noises
+* [Common Voice 16.0](https://commonvoice.mozilla.org/en/datasets) (Mozilla Public License 2.0) - Unused for now
 
 ## Reproduction
 
 > [!CAUTION]
-> Downloading and synthesizing the dataset requires about 3TB of disk space and several hours to download, unpack and synthesize.
+> Downloading and synthesizing the dataset requires about 8TB of disk space and several hours to download, unpack and synthesize.
 
 ### Downloading sources
 To download source datasets, you can invoke `download.sh` script. For this script `aria2` is required.

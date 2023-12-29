@@ -1,3 +1,4 @@
+set -e
 # ***** Datasets for ICASSP 2022 DNS Challenge 4 - Main (Real-Time) Track *****
 
 # NOTE: Before downloading, make sure you have enough space
@@ -182,11 +183,18 @@ OUTPUT_PATH="./dataset/source/source_dns_challenge_4"
 
 mkdir -p $OUTPUT_PATH/{clean_fullband,noise_fullband}
 
-# Download
+# # Download
+# for BLOB in ${BLOB_NAMES[@]}
+# do
+#     URL="$AZURE_URL/$BLOB"
+#     echo "Download: $BLOB"
+#     aria2c -x8 --file-allocation=none "$URL" -o "$OUTPUT_PATH/$BLOB"
+#     # curl "$URL" | tar -C "$OUTPUT_PATH" -f - -x -j
+# done
+
+# Extract
 for BLOB in ${BLOB_NAMES[@]}
 do
-    URL="$AZURE_URL/$BLOB"
-    echo "Download: $BLOB"
-    aria2c -x8 --file-allocation=none "$URL" -o "$OUTPUT_PATH/$BLOB"
-    # curl "$URL" | tar -C "$OUTPUT_PATH" -f - -x -j
+    echo "Extract: $BLOB"
+    tar -xvf "$OUTPUT_PATH/$BLOB" -C "$OUTPUT_PATH" --strip-components=1
 done

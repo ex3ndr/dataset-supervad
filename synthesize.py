@@ -55,12 +55,12 @@ PARAM_EFFECTS = sequental(
 
 # RIR
 PARAM_RIR_PROB = 0.5 # Probability of RIR presence
-
+PARAM_RIR_REAL_PROB = 0.3 # Probability of real RIR instead of synthetic
 #
 # Synthesizer
 #
 
-def synthesize_iter(to, speech_files, background_files, rir_files, index):
+def synthesize_iter(to, speech_files, background_files, rir_real_files, rir_files, index):
     # Parts
     clean = None
     background = None
@@ -82,7 +82,10 @@ def synthesize_iter(to, speech_files, background_files, rir_files, index):
 
     # Add rir
     if rir_files is not None and random.random() < PARAM_RIR_PROB:
-        rir = load_audio(random.choice(rir_files))
+        if random.random() < PARAM_RIR_REAL_PROB:
+            rir = load_audio(random.choice(rir_real_files))
+        else:
+            rir = load_audio(random.choice(rir_files))
 
     # Add codec
     if random.random() < PARAM_CODECS_PROB:
@@ -129,11 +132,11 @@ def synthesize_iter(to, speech_files, background_files, rir_files, index):
     return fname, labels
 
 def synthesize_parallel(args):
-    to, speech_files, background_files, rir_files, i = args
-    return synthesize_iter(to, speech_files, background_files, rir_files, i)
+    to, speech_files, background_files, rir_real_files, rir_files, i = args
+    return synthesize_iter(to, speech_files, background_files, rir_real_files, rir_files, i)
 
 
-def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
+def synthesize(to, speech_dir, background_dir, rir_real_dir, rir_dir, count = PARAM_COUNT):
 
     # Check directory
     if os.path.isdir(to):
@@ -145,6 +148,7 @@ def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
     speech_files = glob(speech_dir + "**/*.wav", recursive=True)
     background_files = glob(background_dir + "**/*.wav", recursive=True)
     rir_files = glob(rir_dir + "**/*.wav", recursive=True)
+    rir_real_files = glob(rir_real_dir + "**/*.wav", recursive=True)
 
     # Create folders
     print("Creating folders...")
@@ -158,14 +162,15 @@ def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
     output = {}
     if PARAM_WORKERS == 0:
         for i in tqdm(range(count)):
-            fname, labels = synthesize_iter(to, speech_files, background_files, rir_files, i)
+            fname, labels = synthesize_iter(to, speech_files, background_files, rir_real_files, rir_files, i)
             output[fname] = labels
     else:
         with multiprocessing.Manager() as manager:
             speech_files = manager.list(speech_files)
             background_files = manager.list(background_files)
             rir_files = manager.list(rir_files)
-            args_list = [(to, speech_files, background_files, rir_files, i) for i in range(count)]
+            rir_real_files = manager.list(rir_real_files)
+            args_list = [(to, speech_files, background_files, rir_real_files, rir_files, i) for i in range(count)]
             with multiprocessing.Pool(processes=PARAM_WORKERS) as pool:
                 for result in tqdm(pool.imap_unordered(synthesize_parallel, args_list), total=count):
                     fname, labels = result
@@ -183,14 +188,16 @@ def synthesize(to, speech_dir, background_dir, rir_dir, count = PARAM_COUNT):
 
 if __name__ == "__main__":
     print("Synthesizing test set...")
-    synthesize("./dataset/output/synth_test/", 
+    synthesize("./dataset/output/vad_test/", 
            speech_dir="./dataset/output/speech_test/",
            background_dir="./dataset/output/non_speech/",
-           rir_dir="./dataset/output/rir/",
+           rir_dir="./dataset/output/rir_synthetic/",
+           rir_real_dir="./dataset/output/rir_real/",
            count=PARAM_COUNT_TEST)
     print("Synthesizing train set...")
-    synthesize("./dataset/output/synth_train/", 
+    synthesize("./dataset/output/vad_train/", 
            speech_dir="./dataset/output/speech_train/",
            background_dir="./dataset/output/non_speech/",
-           rir_dir="./dataset/output/rir/",
+           rir_dir="./dataset/output/rir_synthetic/",
+           rir_real_dir="./dataset/output/rir_real/",
            count=PARAM_COUNT)
