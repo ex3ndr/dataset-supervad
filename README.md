@@ -13,16 +13,16 @@ This repository contains the one million of 5 second segments of augmented voice
 
 ## Downloads
 
-* Training Dataset: https://datasets.korshakov.com/supervad-1/vad_train.tar.gz
-* Testing Dataset: https://datasets.korshakov.com/supervad-1/vad_test.tar.gz
+* Training Dataset: https://shared.korshakov.com/datasets/supervad-1/vad_train.tar.gz
+* Testing Dataset: https://shared.korshakov.com/datasets/supervad-1/vad_test.tar.gz
 
 # Extra downloads
 I am also publishing source files that are used for mixing, they are all wav files withg 16kHz sampling rate:
-* Speech Training: https://datasets.korshakov.com/supervad-1/speech_train.tar.gz
-* Speech Testing: https://datasets.korshakov.com/supervad-1/speech_test.tar.gz
-* Non-Speech files: https://datasets.korshakov.com/supervad-1/non_speech.tar.gz
-* Synthetic RIR (cut to the begining and normalized): https://datasets.korshakov.com/supervad-1/rir_synthetic.tar.gz
-* Real RIR (cut to the begining and normalized): https://datasets.korshakov.com/supervad-1/rir_real.tar.gz
+* Speech Training: https://shared.korshakov.com/datasets/supervad-1/speech_train.tar.gz
+* Speech Testing: https://shared.korshakov.com/datasets/supervad-1/speech_test.tar.gz
+* Non-Speech files: https://shared.korshakov.com/datasets/supervad-1/non_speech.tar.gz
+* Synthetic RIR (cut to the begining and normalized): https://shared.korshakov.com/datasets/supervad-1/rir_synthetic.tar.gz
+* Real RIR (cut to the begining and normalized): https://shared.korshakov.com/datasets/supervad-1/rir_real.tar.gz
 
 ## References
 
