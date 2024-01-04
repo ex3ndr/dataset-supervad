@@ -7,6 +7,7 @@ from multiprocessing import Pool
 from utils import SAMPLE_RATE, load_audio, save_audio
 import pathlib
 import multiprocessing
+from prepare_dns import load_dns_noise_with_voice
 
 #
 # Parameters
@@ -15,44 +16,6 @@ import multiprocessing
 PARAM_MAX_DURATION = 5
 PARAM_MIN_DURATION = 0.5
 PARAM_WORKERS = multiprocessing.cpu_count()
-
-speech_dirs = [
-    "./dataset/source/source_musan/speech/", 
-    "./dataset/source/source_voices_release/source-16k/train/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/emotional_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/french_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/german_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/italian_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/read_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/russian_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/spanish_speech/",
-    "./dataset/source/source_dns_challenge_4/clean_fullband/vctk_wav48_silence_trimmed/",
-]
-speech_test_dirs = [
-    "./dataset/source/source_voices_release/source-16k/test/",
-]
-non_speech_dirs = [
-    "./dataset/source/source_musan/music/", 
-    "./dataset/source/source_musan/noise/", 
-    # "./dataset/source/source_rir/pointsource_noises/", # This is from Musan too
-    "./dataset/source/source_voices_release/distant-16k/distractors/",
-    "./dataset/source/source_dns_challenge_4/noise_fullband/",
-    "./dataset/source/source_urban_mixture/recordings/"
-]
-
-rir_synthetic_dirs = [
-    "./dataset/source/source_rir_sim/",
-]
-
-rir_dirs = [
-    "./dataset/source/source_voices_release/distant-16k/room-response/rm1/impulse/",
-    "./dataset/source/source_voices_release/distant-16k/room-response/rm2/impulse/",
-    "./dataset/source/source_voices_release/distant-16k/room-response/rm3/impulse/",
-    "./dataset/source/source_voices_release/distant-16k/room-response/rm4/impulse/",
-]
-rir_special_dirs = [
-    "./dataset/source/source_rir/real_rirs_isotropic_noises/",
-]
 
 #
 # File split
@@ -202,10 +165,25 @@ def process_impulse(files, to):
 # Listing files
 #
 
-def list_all_files(dirs, pattern = "*.wav"):
+def list_all_files(rules):
     wav = []
-    for d in dirs:
-        wav.extend(glob(d + "**/" + pattern, recursive=True))
+    for d in rules:
+        path = d['path']
+        patterns = ["*.wav"]
+        if 'patterns' in d:
+            patterns = d['patterns']
+        for pattern in patterns:
+                found = glob(path + "**/" + pattern, recursive=True)
+                if 'ignore' in d:
+                    filtered = []
+                    for f in found:
+                        f = f[len(path):]
+                        if f not in d['ignore']:
+                            filtered.append(path + f)
+                        # else:
+                        #     print("Ignoring: ", f)
+                    found = filtered
+                wav.extend(found)
     return wav
 
 
@@ -214,6 +192,76 @@ def list_all_files(dirs, pattern = "*.wav"):
 #
 
 if __name__ == "__main__":
+
+    #
+    # Speech Files
+    #
+
+    speech_dirs = [
+        { 'path': "./dataset/source/source_musan/speech/" }, 
+        { 'path': "./dataset/source/source_voices_release/source-16k/train/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/emotional_speech/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/french_speech/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/german_speech/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/italian_speech/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/read_speech/"  },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/russian_speech/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/spanish_speech/" },
+        { 'path': "./dataset/source/source_dns_challenge_4/clean_fullband/vctk_wav48_silence_trimmed/" },
+    ]
+    speech_test_dirs = [
+        { 'path': "./dataset/source/source_voices_release/source-16k/test/" },
+    ]
+
+    #
+    # Non-Speech Files
+    #
+
+    non_speech_dirs = [
+
+        # Some folders has singing and we are excluging them
+        { 'path': "./dataset/source/source_musan/music/fma/" }, 
+        { 'path': "./dataset/source/source_musan/music/fma-western-art/" },
+        { 'path': "./dataset/source/source_musan/music/hd-classical/" },
+        { 'path': "./dataset/source/source_musan/music/rfm/" },
+        { 'path': "./dataset/source/source_musan/noise/" }, 
+
+        # { 'path': "./dataset/source/source_rir/pointsource_noises/" }, # This is same from musan
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm1/babb/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm1/musi/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm1/none/" },
+
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm2/babb/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm2/musi/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm2/none/" },
+
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm3/babb/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm3/musi/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm3/none/" },
+
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm4/babb/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm4/musi/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/distractors/rm4/none/" },
+
+        { 'path': "./dataset/source/source_dns_challenge_4/noise_fullband/", 'ignore': load_dns_noise_with_voice() }, # Some noises are with voice
+        
+        { 'path': "./dataset/source/source_urban_mixture/recordings/" }
+    ]
+
+    #
+    # Room Impulse Response Files
+    #
+
+    rir_synthetic_dirs = [
+        { 'path': "./dataset/source/source_rir_sim/" },
+    ]
+    rir_dirs = [
+        { 'path': "./dataset/source/source_voices_release/distant-16k/room-response/rm1/impulse/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/room-response/rm2/impulse/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/room-response/rm3/impulse/" },
+        { 'path': "./dataset/source/source_voices_release/distant-16k/room-response/rm4/impulse/" },
+        { 'path': "./dataset/source/source_rir/real_rirs_isotropic_noises/", 'patterns': ["air_type1_air_*.wav", "RVB2014_type1_rir_*.wav", "RWCP_type4_rir_????.wav"] },
+    ]
     
     #
     # Load and shuffle all files
@@ -223,10 +271,7 @@ if __name__ == "__main__":
     non_speech_files = list_all_files(non_speech_dirs)
     speech_files = list_all_files(speech_dirs)
     speech_test_files = list_all_files(speech_test_dirs)
-    rir_files = list_all_files(rir_dirs) + \
-        list_all_files(rir_special_dirs, "air_type1_air_*.wav") + \
-        list_all_files(rir_special_dirs, "RVB2014_type1_rir_*.wav") + \
-        list_all_files(rir_special_dirs, "RWCP_type4_rir_????.wav")
+    rir_files = list_all_files(rir_dirs)
     rir_synthetic_files = list_all_files(rir_synthetic_dirs)
 
     # Shuffle them in reproducible way
@@ -246,13 +291,13 @@ if __name__ == "__main__":
     # Do processing
     #
 
-    print("Processing Synthetic RIR...")
-    i, d = process_impulse(rir_synthetic_files, "./dataset/output/rir_synthetic/")
-    print("RIR files: ", i, " duration: ", d)
+    # print("Processing Synthetic RIR...")
+    # i, d = process_impulse(rir_synthetic_files, "./dataset/output/rir_synthetic/")
+    # print("RIR files: ", i, " duration: ", d)
 
-    print("Processing Real RIR...")
-    i, d = process_impulse(rir_files, "./dataset/output/rir_real/")
-    print("RIR files: ", i, " duration: ", d)
+    # print("Processing Real RIR...")
+    # i, d = process_impulse(rir_files, "./dataset/output/rir_real/")
+    # print("RIR files: ", i, " duration: ", d)
 
     print("Processing Non-Speech...")
     i, d = split_files(non_speech_files, "./dataset/output/non_speech/")

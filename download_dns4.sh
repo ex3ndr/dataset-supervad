@@ -179,22 +179,28 @@ BLOB_NAMES=(
 
 AZURE_URL="https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband"
 
-OUTPUT_PATH="./dataset/source/source_dns_challenge_4"
+OUTPUT_PATH="./dataset/source/source_dns_challenge_4/"
 
 mkdir -p $OUTPUT_PATH/{clean_fullband,noise_fullband}
 
-# # Download
-# for BLOB in ${BLOB_NAMES[@]}
-# do
-#     URL="$AZURE_URL/$BLOB"
-#     echo "Download: $BLOB"
-#     aria2c -x8 --file-allocation=none "$URL" -o "$OUTPUT_PATH/$BLOB"
-#     # curl "$URL" | tar -C "$OUTPUT_PATH" -f - -x -j
-# done
+# Download
+for BLOB in ${BLOB_NAMES[@]}
+do
+    URL="$AZURE_URL/$BLOB"
+    echo "Download: $BLOB"
+    aria2c -x8 --file-allocation=none "$URL" -o "$OUTPUT_PATH/$BLOB"
+done
 
 # Extract
 for BLOB in ${BLOB_NAMES[@]}
 do
     echo "Extract: $BLOB"
     tar -xvf "$OUTPUT_PATH/$BLOB" -C "$OUTPUT_PATH" --strip-components=1
+done
+
+# Delete
+for BLOB in ${BLOB_NAMES[@]}
+do
+    echo "Delete: $BLOB"
+    rm $OUTPUT_PATH/$BLOB
 done

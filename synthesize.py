@@ -15,8 +15,8 @@ import multiprocessing
 
 # Synthesizing parameters
 PARAM_DURATION = 5
-PARAM_COUNT = 1000000
-PARAM_COUNT_TEST = 10000
+PARAM_COUNT = 5000000
+PARAM_COUNT_TEST = 50000
 PARAM_WORKERS = multiprocessing.cpu_count()
 
 # Speech parameters

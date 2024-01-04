@@ -31,7 +31,7 @@ def labels_to_intervals(labels, scale):
 
     # Handle the case where the array ends with a 1
     if start is not None:
-        intervals.append((start * scale, (len(labels) - 1) * scale))
+        intervals.append((start * scale, (len(labels)) * scale))
 
     return intervals
 
