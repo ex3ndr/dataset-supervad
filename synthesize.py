@@ -15,7 +15,7 @@ import multiprocessing
 
 # Synthesizing parameters
 PARAM_DURATION = 5
-PARAM_COUNT = 5000000
+PARAM_COUNT = 2000000
 PARAM_COUNT_TEST = 50000
 PARAM_WORKERS = multiprocessing.cpu_count()
 

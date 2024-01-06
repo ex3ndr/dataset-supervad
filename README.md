@@ -4,7 +4,7 @@ This repository contains the one million of 5 second segments of augmented voice
 
 ## Dataset
 
-* Duration: 1M of files, 5 seconds length and 10k of test files.
+* Duration: 2M of files, 5 seconds length and 50k of test files.
 * Audio format: WAV files with 16kHz sampling rate and 16 bit depth
 * Signal-to-noise ratio (SNR): from 3 to 30db
 * Source voice speedup or slowdown: from 0.8 to 1.5
@@ -13,16 +13,21 @@ This repository contains the one million of 5 second segments of augmented voice
 
 ## Downloads
 
-* Training Dataset: https://shared.korshakov.com/datasets/supervad-1/vad_train.tar.gz
-* Testing Dataset: https://shared.korshakov.com/datasets/supervad-1/vad_test.tar.gz
+* Training Dataset: https://shared.korshakov.com/datasets/supervad-2/vad_train.tar.gz
+* Testing Dataset: https://shared.korshakov.com/datasets/supervad-2/vad_test.tar.gz
 
 # Extra downloads
 I am also publishing source files that are used for mixing, they are all wav files withg 16kHz sampling rate:
-* Speech Training: https://shared.korshakov.com/datasets/supervad-1/speech_train.tar.gz
-* Speech Testing: https://shared.korshakov.com/datasets/supervad-1/speech_test.tar.gz
-* Non-Speech files: https://shared.korshakov.com/datasets/supervad-1/non_speech.tar.gz
-* Synthetic RIR (cut to the begining and normalized): https://shared.korshakov.com/datasets/supervad-1/rir_synthetic.tar.gz
-* Real RIR (cut to the begining and normalized): https://shared.korshakov.com/datasets/supervad-1/rir_real.tar.gz
+* Speech Training: https://shared.korshakov.com/datasets/supervad-2/speech_train.tar.gz
+* Speech Testing: https://shared.korshakov.com/datasets/supervad-2/speech_test.tar.gz
+* Non-Speech files: https://shared.korshakov.com/datasets/supervad-2/non_speech.tar.gz
+* Synthetic RIR (cut to the begining and normalized): https://shared.korshakov.com/datasets/supervad-2/rir_synthetic.tar.gz
+* Real RIR (cut to the begining and normalized): https://shared.korshakov.com/datasets/supervad-2/rir_real.tar.gz
+
+# Versions
+
+* v2 - filtered some files with too loud background voices, removed some songs from the dataset that also had voice
+* v1 - initial release
 
 ## References
 
